@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content" v-show="isShowLogin">
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="0" class="" @keyup.enter.native="submitForm('ruleForm')">
 
       <el-form-item label="" prop="system">
@@ -79,7 +79,9 @@
       ...mapGetters({
         sys : 'getStoreSys',
         org : 'getStoreOrg',
-        branch : 'getStoreBranch'
+        branch : 'getStoreBranch',
+        userInfo : 'getUserInfo',
+        isShowLogin : 'getIsShowLogin'
       })
     },
     methods: {
@@ -87,6 +89,15 @@
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.loading = true
+            let ruleForm = this.ruleForm
+            let params = {
+              organizationId: ruleForm.org,
+              password: ruleForm.password,
+              servicebranchId: ruleForm.branch,
+              username: ruleForm.username,
+              systemId: ruleForm.system
+            }
+            this.login(params)
           }
         })
       },
@@ -96,7 +107,8 @@
       ...mapActions([
         'getSystem',
         'getOrg',
-        'getBranch'
+        'getBranch',
+        'login'
       ]),
       sysChange (id) {
         if (id === '6f9d1b4c3d9d4dc39117031740fcaa05'){

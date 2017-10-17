@@ -4,14 +4,6 @@ import { post } from '@/common/require';
 import api from '@/common/api';
 import {localStore} from '@/common/storage';
 
-//刷新路由视图
-const reloadRouterView = (commit) => {
-  commit('setRouterViewShow', false);
-  setTimeout(() => {
-    commit('setRouterViewShow', true);
-  });
-};
-
 export default {
   //获取系统
   getSystem({commit}, params = {}){
@@ -46,29 +38,47 @@ export default {
       return res;
     });
   },
-  //登录
-  loginByPass({commit}, params = {}){
+  //获取权限
+  getAuths({commit}, params = {}){
     return post({
-      url: api.userSignin,
+      url: api.getAuths,
       data: params
     }).then(res => {
-      //刷新路由视图
-      reloadRouterView(commit);
-       //设置用户信息
+      //设置用户信息
       commit('setUserInfo', res.data);
+      commit('hideLogin');
+      localStore.set('userInfo',JSON.stringify(res.data))
+      return res;
+    }).catch( () => {
+      commit('showLogin');
+      localStore.remove('secret');
+      localStore.remove('setUserInfo');
+    });
+  },
+  //登录
+  login({commit}, params = {}){
+    return post({
+      url: api.login,
+      data: params
+    }).then(res => {
+       //设置用户信息
+      localStore.set('secret',res.data.secret);
       return res;
     });
   },
   //退出登录
-  logoutById({commit}, params = {}){
+  userLogout({commit}, params = {}){
+    let userInfo = JSON.parse(localStore.get('userInfo'));
     return post({
-      url: api.userSignout,
-      data: params
+      url: api.logout,
+      data: {
+        systemId: userInfo.currentSystem.id
+      }
     }).then(res => {
-      //刷新路由视图
-      reloadRouterView(commit);
       //清除本地数据
-      localStore.remove('userInfo');
+      commit('showLogin');
+      localStore.remove('secret');
+      localStore.remove('setUserInfo');
       //清空用户信息
       commit('setUserInfo', {});
 

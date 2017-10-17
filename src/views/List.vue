@@ -6,7 +6,10 @@
 
 <script>
   export default {
-    name: 'List'
+    name: 'List',
+    beforeMount () {
+//      console.log(this)
+    }
   }
 </script>
 

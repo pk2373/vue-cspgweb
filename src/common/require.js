@@ -1,5 +1,5 @@
 import axios from 'axios';
-import * as qs from 'qs';
+// import * as qs from 'qs';
 //引入 vuex
 import store from '@/vuex';
 
@@ -83,13 +83,15 @@ export const get = (opts = {}, commit) => {
  * @return {Promise}         Promise
  */
 export const post = (opts = {}, commit) => {
+  let userInfo = localStore.get('userInfo') || {};
+  userInfo = JSON.parse(userInfo)
   let setting = {
     url : '',
     method: 'POST',
     headers: {
       'Content-Type': CONTENT_TYPE
     },
-    data: {"uid":0,"data":{},"page":1,"start":0,"limit":1000000}
+    data: {"uid":userInfo.userId || 0,"data":{},"page":1,"start":0,"limit":1000000}
   };
 
   //合并对象
